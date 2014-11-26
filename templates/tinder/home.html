@@ -1,0 +1,90 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <style>
+        .container {
+          width: 950px;
+        }
+      body {
+        background-color: #f6f5f1;
+      }
+      .current-image {
+        position: absolute;
+        z-index:2;
+        width:100%;
+      }
+
+      .next-image {
+        position: absolute;
+        z-index:1;
+        width:100%;
+      }
+
+      .back-image {
+        position: absolute;
+        z-index:0;
+        width:100%;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container" style="background-color:#f6f5f1">
+      {% load staticfiles %}
+      <div class="row">
+        <div class="col-xs-2">
+          <img src="{% static "tinder/icon-top-left.jpg" %}" style="width:100%; margin-top:20px;">
+        </div>
+        <div class="col-xs-8">
+          <img src="{% static "tinder/logo.jpg" %}" width="60%" class="img-responsive center-block">
+        </div>
+        <div class="col-xs-2">
+          <img src="{% static "tinder/icon-top-right.svg" %}" style="margin-top:20px; width:100%">
+        </div>
+      </div>
+      <div class="row" style="margin-top:48px" id="photobox">
+        <div class="col-xs-10 col-xs-offset-1">
+          <div class="current-image">
+            <img src="/static/{{image0}}" width="100%" class="img-responsive center-block">
+          </div>
+          <div class="next-image">
+            <img src="/static/{{image1}}" width="100%" class="img-responsive center-block">
+          </div>
+          {% for image in images %}
+          <div class="back-image">
+            <img src="/static/{{image}}" width="100%" class="img-responsive center-block">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 col-xs-offset-1" style="margin-top:780px">
+          <img src="{% static "tinder/logo-bottom.jpg" %}" width="100%">
+        </div>
+      </div>
+    </div>
+  <script type="text/javascript">
+    var current_image = $(".current-image")[0];
+    var next_images = $(".next-image, .back-image").toArray();
+    $(function() {
+      $("#photobox").on("swipe", function(event) {
+        var swipe_type = event.swipestart.coords[0] < event.swipestop.coords[0] ? "swiperight" : "swipeleft";
+        var swipe_offset = swipe_type == "swiperight" ? "+1000px" : "-1000px"; 
+
+        $(".current-image").animate({ "left": swipe_offset }, complete = function() {
+          $(this).removeClass("current-image").addClass("back-image").css({left: ""});
+          next_images.push($(this)[0]); 
+          current_image = next_images.shift();
+          $(current_image).removeClass("next-image").addClass("current-image");
+          $(next_images[0]).removeClass("back-image").addClass("next-image");
+        });
+      });
+    });
+  </script>
+  </body>
+</html>
+
+
